@@ -7,16 +7,16 @@
 //
 
 #import "APIHandler.h"
-//#import "JSONKit.h"
 
 @implementation APIHandler
 
 
-- (void)executeRequest: (NSString *)urlRequest Method:(RequestMethod*)method withCallback:(void(^)(NSDictionary *, NSError *))callback{
+- (void)executeRequest: (NSString *)urlRequest withCallback:(void(^)(NSDictionary *, NSError *))callback{
     self.completionBlock = callback;
         NSURL *url = [NSURL URLWithString:urlRequest];
     self.responseData = [NSMutableData data];
     NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:url] delegate:self];
+    connection = nil;
 }
 
 #pragma mark URLConnection delegate methods

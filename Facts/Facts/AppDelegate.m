@@ -51,6 +51,9 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    NSFileManager *fileManager = [[NSFileManager alloc] init];    NSString *ddPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject;
+    NSString *imgFolderPath = [ddPath stringByAppendingString:@"/img"];
+    [fileManager removeItemAtPath:imgFolderPath error:nil];
 }
 
 
