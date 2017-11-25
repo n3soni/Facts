@@ -9,13 +9,13 @@
 #import "UIImageView+Addition.h"
 
 @implementation UIImageView (Addition)
-- (void)getImageFromUrl: (NSString *)imgUrl Callback:(void (^)(void))callback{
+- (void)getImageFromUrl: (NSString *)imgUrl Callback:(void (^)(CGSize))callback{
 //    NSLog(@"started for %@", imgUrl);
     NSString *imgName = [imgUrl componentsSeparatedByString:@"/"].lastObject;
     UIImage *img = [self getImageWithName:imgName];
     if (img != nil){
         self.image = img;
-        callback();
+        callback(self.image.size);
     }else{
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             NSData *data = [NSData dataWithContentsOfURL:[NSURL URLWithString:imgUrl]];
@@ -23,7 +23,7 @@
             [self saveImageWithName:imgName Data:data];
             dispatch_sync(dispatch_get_main_queue(), ^{
                 self.image = [UIImage imageWithData:data];
-                callback();
+                callback(self.image.size);
             });
             
         });

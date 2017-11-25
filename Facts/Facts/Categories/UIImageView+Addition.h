@@ -9,5 +9,5 @@
 #import <UIKit/UIKit.h>
 
 @interface UIImageView (Addition)
-- (void)getImageFromUrl: (NSString *)imgUrl Callback:(void (^)(void))callback;
+- (void)getImageFromUrl: (NSString *)imgUrl Callback:(void (^)(CGSize))callback;
 @end
