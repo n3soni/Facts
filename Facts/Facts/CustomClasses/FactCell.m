@@ -10,6 +10,7 @@
 #import "Fact.h"
 #import "UIImageView+Addition.h"
 
+
 @implementation FactCell
 
 - (void)awakeFromNib {

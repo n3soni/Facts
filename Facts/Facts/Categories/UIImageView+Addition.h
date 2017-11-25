@@ -11,3 +11,4 @@
 @interface UIImageView (Addition)
 - (void)getImageFromUrl: (NSString *)imgUrl Callback:(void (^)(CGSize))callback;
 @end
+

@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
+
 @interface APIHandler : NSObject<NSURLConnectionDelegate, NSURLConnectionDataDelegate>
 @property (nonatomic, strong) NSMutableData *responseData;
 @property (copy) void(^completionBlock)(NSDictionary *, NSError*);

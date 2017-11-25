@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		53A9877B1FC91ADA00ED9FA3 /* FactCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 53A9877A1FC91ADA00ED9FA3 /* FactCell.m */; };
+		53F7D3CE1FC7632F006F4022 /* UIImageView+Addition.m in Sources */ = {isa = PBXBuildFile; fileRef = 53F7D3CD1FC7632F006F4022 /* UIImageView+Addition.m */; };
 		C284D8E41FC54E19001F0093 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C284D8E31FC54E19001F0093 /* AppDelegate.m */; };
 		C284D8E71FC54E19001F0093 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C284D8E61FC54E19001F0093 /* ViewController.m */; };
 		C284D8EC1FC54E19001F0093 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C284D8EB1FC54E19001F0093 /* Assets.xcassets */; };
@@ -28,6 +30,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		53A987791FC91ADA00ED9FA3 /* FactCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FactCell.h; sourceTree = "<group>"; };
+		53A9877A1FC91ADA00ED9FA3 /* FactCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FactCell.m; sourceTree = "<group>"; };
+		53F7D3CC1FC7632F006F4022 /* UIImageView+Addition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImageView+Addition.h"; sourceTree = "<group>"; };
+		53F7D3CD1FC7632F006F4022 /* UIImageView+Addition.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+Addition.m"; sourceTree = "<group>"; };
 		C284D8DF1FC54E19001F0093 /* Facts.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Facts.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C284D8E21FC54E19001F0093 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		C284D8E31FC54E19001F0093 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -65,6 +71,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		53A987781FC91AB400ED9FA3 /* CustomClasses */ = {
+			isa = PBXGroup;
+			children = (
+				53A987791FC91ADA00ED9FA3 /* FactCell.h */,
+				53A9877A1FC91ADA00ED9FA3 /* FactCell.m */,
+			);
+			path = CustomClasses;
+			sourceTree = "<group>";
+		};
+		53F7D3CB1FC76286006F4022 /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				53F7D3CC1FC7632F006F4022 /* UIImageView+Addition.h */,
+				53F7D3CD1FC7632F006F4022 /* UIImageView+Addition.m */,
+			);
+			path = Categories;
+			sourceTree = "<group>";
+		};
 		C284D8D61FC54E19001F0093 = {
 			isa = PBXGroup;
 			children = (
@@ -91,6 +115,8 @@
 				C284D8E31FC54E19001F0093 /* AppDelegate.m */,
 				C284D8E51FC54E19001F0093 /* ViewController.h */,
 				C284D8E61FC54E19001F0093 /* ViewController.m */,
+				53A987781FC91AB400ED9FA3 /* CustomClasses */,
+				53F7D3CB1FC76286006F4022 /* Categories */,
 				C29F29F31FC6AD4700DE5F30 /* APIHandler */,
 				C29F29F11FC6AD3900DE5F30 /* SupportingFiles */,
 				C29F29EE1FC6AD2D00DE5F30 /* Models */,
@@ -239,6 +265,8 @@
 			files = (
 				C29F29FF1FC6D4DA00DE5F30 /* Fact.m in Sources */,
 				C284D8E71FC54E19001F0093 /* ViewController.m in Sources */,
+				53F7D3CE1FC7632F006F4022 /* UIImageView+Addition.m in Sources */,
+				53A9877B1FC91ADA00ED9FA3 /* FactCell.m in Sources */,
 				C284D8F21FC54E19001F0093 /* main.m in Sources */,
 				C284D8E41FC54E19001F0093 /* AppDelegate.m in Sources */,
 				C29F29F91FC6BC3000DE5F30 /* APIHandler.m in Sources */,

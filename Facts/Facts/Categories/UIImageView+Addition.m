@@ -8,6 +8,7 @@
 
 #import "UIImageView+Addition.h"
 
+
 @implementation UIImageView (Addition)
 - (void)getImageFromUrl: (NSString *)imgUrl Callback:(void (^)(CGSize))callback{
 //    NSLog(@"started for %@", imgUrl);
