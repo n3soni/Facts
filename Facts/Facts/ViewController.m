@@ -11,14 +11,13 @@
 #import "APIHandler.h"
 #import "Fact.h"
 #import "UIImageView+Addition.h"
+#import "FactCell.h"
 
 
 @interface ViewController () <UITableViewDelegate, UITableViewDataSource>
 @property (strong, nonatomic) UITableView *tblFacts;
 @property (strong, nonatomic) UILabel *lblHeaderTitle;
 @property (nonatomic, strong) NSMutableArray *arrFacts;
-@property (nonatomic, strong) NSMutableArray *arrHeights;
-@property (nonatomic, assign) int heightChangedForIndex;
 @end
 
 @implementation ViewController
@@ -26,7 +25,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.arrFacts = [NSMutableArray array];
-    self.heightChangedForIndex = -1;
     [self fetchFacts];
 }
 
@@ -49,15 +47,17 @@
     NSLayoutConstraint *lblCenterY = [NSLayoutConstraint constraintWithItem:self.lblHeaderTitle attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:headerView attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0];
     [headerView addConstraint:lblCenterX];
     [headerView addConstraint:lblCenterY];
-//    NSLayoutConstraint *headerViewConstraintLeft = [NSLayoutConstraint constraintWithItem:headerView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0];
-//    NSLayoutConstraint *headerViewConstraintRight = [NSLayoutConstraint constraintWithItem:headerView attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeRight multiplier:1.0 constant:0];
-//    NSLayoutConstraint *headerViewConstraintTop = [NSLayoutConstraint constraintWithItem:headerView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.view attribute:NSLayoutAttributeTop multiplier:1.0 constant:0];
-//    NSLayoutConstraint *headerViewConstraintHeight = [NSLayoutConstraint constraintWithItem:headerView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:60];
-//    [headerView addConstraint:headerViewConstraintHeight];
+    headerView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:headerView];
-//    [headerView addConstraint:headerViewConstraintLeft];
-//    [headerView addConstraint:headerViewConstraintRight];
-//    [self.view addConstraint:headerViewConstraintTop];
+    //constrains for header
+    NSLayoutConstraint *headerViewConstraintLeft = [NSLayoutConstraint constraintWithItem:headerView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:headerView.superview attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0];
+    NSLayoutConstraint *headerViewConstraintRight = [NSLayoutConstraint constraintWithItem:headerView attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:headerView.superview attribute:NSLayoutAttributeRight multiplier:1.0 constant:0];
+    NSLayoutConstraint *headerViewConstraintTop = [NSLayoutConstraint constraintWithItem:headerView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:headerView.superview attribute:NSLayoutAttributeTop multiplier:1.0 constant:0];
+    NSLayoutConstraint *headerViewConstraintHeight = [NSLayoutConstraint constraintWithItem:headerView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:60];
+    [headerView addConstraint:headerViewConstraintHeight];
+    [headerView.superview addConstraint:headerViewConstraintLeft];
+    [headerView.superview addConstraint:headerViewConstraintRight];
+    [headerView.superview addConstraint:headerViewConstraintTop];
     
     //prepare table and populate
     CGRect tblFrame = self.view.frame;
@@ -67,6 +67,17 @@
     self.tblFacts.dataSource = self;
     self.tblFacts.delegate = self;
     [self.view addSubview:self.tblFacts];
+    self.tblFacts.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    //constraints for tblFacts
+    NSLayoutConstraint *tblFactsConstraintLeft = [NSLayoutConstraint constraintWithItem:self.tblFacts attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.tblFacts.superview attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0];
+    NSLayoutConstraint *tblFactsConstraintRight = [NSLayoutConstraint constraintWithItem:self.tblFacts attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self.tblFacts.superview attribute:NSLayoutAttributeRight multiplier:1.0 constant:0];
+    NSLayoutConstraint *tblFactsConstraintTop = [NSLayoutConstraint constraintWithItem:self.tblFacts attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:headerView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0];
+    NSLayoutConstraint *tblFactsConstraintBottom = [NSLayoutConstraint constraintWithItem:self.tblFacts attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.tblFacts.superview attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0];
+    [self.tblFacts.superview addConstraint:tblFactsConstraintTop];
+    [self.tblFacts.superview addConstraint:tblFactsConstraintLeft];
+    [self.tblFacts.superview addConstraint:tblFactsConstraintRight];
+    [self.tblFacts.superview addConstraint:tblFactsConstraintBottom];
 }
 
 - (void)fetchFacts{
@@ -81,8 +92,8 @@
                 Fact *fact = [[Fact alloc] initWithDictionary:rawFact];
                 [self.arrFacts addObject:fact];
             }
-                [self.tblFacts reloadData];
-//                });
+            [self.tblFacts reloadData];
+//            [self.tblFacts updateConstraints];
         }];
 }
 
@@ -105,52 +116,18 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     NSLog(@"called for cell = %d", indexPath.row);
     static NSString *cellId = @"factCell";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellId];
+    FactCell *cell = (FactCell *)[tableView dequeueReusableCellWithIdentifier:cellId];
     if (cell == nil){
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
-        UILabel *lblTitle = [[UILabel alloc] init];
-        lblTitle.numberOfLines = 0;
-        lblTitle.lineBreakMode = NSLineBreakByWordWrapping;
-        [cell.contentView addSubview:lblTitle];
+        cell = [[FactCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
         
     }
     Fact *fact = self.arrFacts[indexPath.row];
-    cell.textLabel.text = fact.title;
-    cell.imageView.image = nil;
-    cell.detailTextLabel.text = fact.internalBaseClassDescription;
-//    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-//        NSData *imgData = [NSData dataWithContentsOfURL:[NSURL URLWithString:fact.imageHref]];
-//        if (imgData != nil){
-//        dispatch_sync(dispatch_get_main_queue(), ^{
-//            cell.imageView.image = [UIImage imageWithData:imgData];
-//            [tableView beginUpdates];
-//            [tableView endUpdates];
-//        });
-//        }
-//    });
-    if (fact.imageHref != nil){
-        [cell.imageView getImageFromUrl:fact.imageHref Callback:^{
-            if ([[self.tblFacts visibleCells] containsObject:cell]){
-//                self.heightChangedForIndex = indexPath.row;
-//            [self.tblFacts reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
-                [self.tblFacts beginUpdates];
-                [self.tblFacts reloadRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationNone];
-
-                [self.tblFacts endUpdates];
-            }
-        }];
-    }
-    
+    [cell configureCell:fact];
     return cell;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-//    if (self.arrHeights[indexPath.row] == 0 || self.heightChangedForIndex == indexPath.row){
-//        NSNumber *num = [NSNumber numberWithFloat:UITableViewAutomaticDimension];
-//        [self.arrHeights replaceObjectAtIndex:indexPath.row withObject:num];
         return UITableViewAutomaticDimension;
-//    }
-//    return [self.arrHeights[indexPath.row] floatValue];
 }
 
 
