@@ -115,22 +115,30 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    NSLog(@"called for cell = %d", indexPath.row);
-    static NSString *cellId = @"factCell";
-    FactCell *cell = (FactCell *)[tableView dequeueReusableCellWithIdentifier:cellId];
+    
+    Fact *fact = self.arrFacts[indexPath.row];
+    FactCell *cell;
+    static NSString * cellId = @"";
+    if (fact.imageHref == (NSString *)[NSNull null] || [fact.imageHref isEqualToString:@"null"] || fact.imageHref == nil){
+        cellId = @"factCellNew";
+        cell = (FactCell *)[tableView dequeueReusableCellWithIdentifier:cellId];
+    }else{
+    cellId = @"factCell";
+    cell = (FactCell *)[tableView dequeueReusableCellWithIdentifier:cellId];
+    }
     if (cell == nil){
         cell = [[FactCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
-        
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
-    Fact *fact = self.arrFacts[indexPath.row];
-    [cell configureCell:fact];
+    cell.tag = indexPath.row;
+    
+    [cell configureCell:fact forIndexPath:indexPath];
     return cell;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
         return UITableViewAutomaticDimension;
 }
-
 
 
 @end
