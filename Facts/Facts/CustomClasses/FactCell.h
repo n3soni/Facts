@@ -16,5 +16,6 @@
 @property (nonatomic, strong) UILabel *lblDescription;
 @property (nonatomic, strong) UIImageView *imgFact;
 @property (nonatomic, strong) NSLayoutConstraint *imgConstraintHeight;
-- (void)configureCell:(Fact *)fact;
+@property (nonatomic, strong) UIImageView *imageHref;
+- (void)configureCell:(Fact *)fact forIndexPath:(NSIndexPath *)indPath;
 @end

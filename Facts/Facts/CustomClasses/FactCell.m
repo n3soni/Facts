@@ -8,7 +8,6 @@
 
 #import "FactCell.h"
 #import "Fact.h"
-#import "UIImageView+Addition.h"
 
 
 @implementation FactCell
@@ -52,7 +51,8 @@
         
         self.imgFact = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.contentView.bounds.size.width, 200)];
         self.imgFact.translatesAutoresizingMaskIntoConstraints = NO;
-        self.imgFact.contentMode = UIViewContentModeScaleAspectFit;
+        self.imgFact.contentMode = UIViewContentModeCenter;
+        self.imgFact.clipsToBounds = YES;
         [self.imgFact setBackgroundColor:[UIColor blackColor]];
         [self.contentView addSubview:self.imgFact];
         
@@ -61,35 +61,80 @@
         NSLayoutConstraint *imgConstraintBottom = [NSLayoutConstraint constraintWithItem:self.imgFact attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self.imgFact.superview attribute:NSLayoutAttributeBottom multiplier:1.0 constant:6];
         NSLayoutConstraint *imgConstraintLeft = [NSLayoutConstraint constraintWithItem:self.imgFact attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.imgFact.superview attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0];
         NSLayoutConstraint *imgConstraintRight = [NSLayoutConstraint constraintWithItem:self.imgFact attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self.imgFact.superview attribute:NSLayoutAttributeRight multiplier:1.0 constant:0];
+        if ([reuseIdentifier isEqualToString:@"factCell"]){
+        self.imgConstraintHeight = [NSLayoutConstraint constraintWithItem:self.imgFact attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:200];
+        }
+        
         
         [self.imgFact.superview addConstraint:imgConstraintTop];
         [self.imgFact.superview addConstraint:imgConstraintBottom];
         [self.imgFact.superview addConstraint:imgConstraintLeft];
         [self.imgFact.superview addConstraint:imgConstraintRight];
+        if ([reuseIdentifier isEqualToString:@"factCell"]){
+            [self.imgFact addConstraint:self.imgConstraintHeight];
+        }
         
     }
     return self;
 }
 
-- (void)configureCell:(Fact *)fact{
+- (void)configureCell:(Fact *)fact forIndexPath:(NSIndexPath *)indPath{
     [self.lblTitle setText:fact.title];
     [self.lblDescription setText:fact.internalBaseClassDescription];
     [self.imgFact setImage:nil];
-    if (fact.imageHref){
-        self.imgConstraintHeight.constant = 200;
-        [self layoutIfNeeded];
-    [self.imgFact getImageFromUrl:fact.imageHref Callback:^(CGSize imgSize) {
-        
-    }];
+    NSString *imgName = [fact.imageHref componentsSeparatedByString:@"/"].lastObject;
+    UIImage *img = [self getImageWithName:imgName];
+    if (img != nil){
+        [self.imgFact setImage:img];
     }else{
-        self.imgConstraintHeight.constant = 0;
-        [self layoutIfNeeded];
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
+    dispatch_async(queue, ^(void) {
+        
+        NSData *imageData = [NSData dataWithContentsOfURL:[NSURL URLWithString:fact.imageHref]];
+                             
+                             UIImage* image = [[UIImage alloc] initWithData:imageData];
+        NSString *imgName = [fact.imageHref componentsSeparatedByString:@"/"].lastObject;
+        [self saveImageWithName:imgName Data:imageData];
+                             if (image) {
+                                 dispatch_async(dispatch_get_main_queue(), ^{
+                                     if (self.tag == indPath.row) {
+                                         self.imgFact.image = image;
+                                         
+                                     }
+                                 });
+                             }
+                             });
     }
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
 
+}
+
+- (void)saveImageWithName: (NSString *)imgName Data: (NSData *)data{
+    NSFileManager *fileManager = [[NSFileManager alloc] init];    NSString *ddPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject;
+    NSString *imgFolderPath = [ddPath stringByAppendingString:@"/img"];
+    NSString *imgPath = [imgFolderPath stringByAppendingPathComponent:imgName];
+    [fileManager createFileAtPath:imgPath contents:data attributes:nil];
+    
+}
+
+- (UIImage *)getImageWithName: (NSString *)imgName{
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    NSString *ddPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject;
+    NSString *imgFolderPath = [ddPath stringByAppendingString:@"/img"];
+    if (![fileManager fileExistsAtPath:imgFolderPath]){
+        [fileManager createDirectoryAtPath:imgFolderPath withIntermediateDirectories:false attributes:nil error:nil];
+    }
+    NSString *imgPath = [imgFolderPath stringByAppendingPathComponent:imgName];
+    if ([fileManager fileExistsAtPath:imgPath]){
+        NSData *imgData = [fileManager contentsAtPath:imgPath];
+        return [UIImage imageWithData:imgData];
+    }else{
+        return nil;
+        
+    }
 }
 
 @end
