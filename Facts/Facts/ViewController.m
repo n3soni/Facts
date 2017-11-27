@@ -117,12 +117,11 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     Fact *fact = self.arrFacts[indexPath.row];
-    BOOL isImageExist = fact.imageHref == (NSString *)[NSNull null] || [fact.imageHref isEqualToString:@"null"] || fact.imageHref == nil;
     static NSString *cellId = @"";
-    if (isImageExist){
-        cellId = kFactCellIdWithImage;
-    }else{
+    if (fact.imageHref == (NSString *)[NSNull null] || [fact.imageHref isEqualToString:@"null"] || fact.imageHref == nil){
         cellId = kFactCellIdWithoutImage;
+    }else{
+        cellId = kFactCellIdWithImage;
     }
     FactCell *cell = (FactCell *)[tableView dequeueReusableCellWithIdentifier:cellId];
     if (cell == nil){
