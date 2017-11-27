@@ -12,8 +12,6 @@
 #import "Fact.h"
 #import "FactCell.h"
 
-static NSString *const kFactCellIdWithImage = @"factCellWithImage";
-static NSString *const kFactCellIdWithoutImage = @"factCellWithoutImage";
 @interface ViewController () <UITableViewDelegate, UITableViewDataSource>
 @property (strong, nonatomic) UITableView *tblFacts;
 @property (strong, nonatomic) UILabel *lblHeaderTitle;
@@ -119,15 +117,14 @@ static NSString *const kFactCellIdWithoutImage = @"factCellWithoutImage";
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     Fact *fact = self.arrFacts[indexPath.row];
-    FactCell *cell;
-    static NSString * cellId = @"";
-    if (fact.imageHref == (NSString *)[NSNull null] || [fact.imageHref isEqualToString:@"null"] || fact.imageHref == nil){
-        cellId = kFactCellIdWithoutImage;
-        cell = (FactCell *)[tableView dequeueReusableCellWithIdentifier:cellId];
-    }else{
+    BOOL isImageExist = fact.imageHref == (NSString *)[NSNull null] || [fact.imageHref isEqualToString:@"null"] || fact.imageHref == nil;
+    static NSString *cellId = @"";
+    if (isImageExist){
         cellId = kFactCellIdWithImage;
-        cell = (FactCell *)[tableView dequeueReusableCellWithIdentifier:cellId];
+    }else{
+        cellId = kFactCellIdWithoutImage;
     }
+    FactCell *cell = (FactCell *)[tableView dequeueReusableCellWithIdentifier:cellId];
     if (cell == nil){
         cell = [[FactCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
