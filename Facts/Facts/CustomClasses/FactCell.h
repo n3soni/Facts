@@ -7,15 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
-
+extern NSString *const kFactCellIdWithImage;
+extern NSString *const kFactCellIdWithoutImage;
 @class Fact;
-
-
 @interface FactCell : UITableViewCell
 @property (nonatomic, strong) UILabel *lblTitle;
 @property (nonatomic, strong) UILabel *lblDescription;
 @property (nonatomic, strong) UIImageView *imgFact;
 @property (nonatomic, strong) NSLayoutConstraint *imgConstraintHeight;
-@property (nonatomic, strong) UIImageView *imageHref;
 - (void)configureCell:(Fact *)fact forIndexPath:(NSIndexPath *)indPath;
 @end
