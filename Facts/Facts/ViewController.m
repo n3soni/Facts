@@ -6,19 +6,19 @@
 //  Copyright © 2017 Nitin. All rights reserved.
 //
 
-
 #import "ViewController.h"
 #import "Constants.h"
 #import "APIHandler.h"
 #import "Fact.h"
-#import "UIImageView+Addition.h"
 #import "FactCell.h"
 
-
+static NSString *const kFactCellIdWithImage = @"factCellWithImage";
+static NSString *const kFactCellIdWithoutImage = @"factCellWithoutImage";
 @interface ViewController () <UITableViewDelegate, UITableViewDataSource>
 @property (strong, nonatomic) UITableView *tblFacts;
 @property (strong, nonatomic) UILabel *lblHeaderTitle;
 @property (nonatomic, strong) NSMutableArray *arrFacts;
+@property (nonatomic, strong) UIRefreshControl *refreshControl;
 @end
 
 @implementation ViewController
@@ -26,16 +26,30 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.arrFacts = [NSMutableArray array];
-    [self fetchFacts];
+}
+
+- (void)addRefreshControl{
+    self.refreshControl = [[UIRefreshControl alloc] init];
+    if (@available(iOS 10.0, *)) {
+        self.tblFacts.refreshControl = self.refreshControl;
+    } else {
+        [self.tblFacts addSubview:self.refreshControl];
+    }
+    UIColor *refreshContentsColor = [UIColor colorWithRed:0.25 green:0.25 blue:0.25 alpha:1.0];
+    [self.refreshControl setTintColor:refreshContentsColor];
+    NSDictionary *attributes = [NSDictionary dictionaryWithObject:refreshContentsColor forKey:NSForegroundColorAttributeName];
+    [self.refreshControl setAttributedTitle:[[NSAttributedString alloc] initWithString:@"Fetching Facts..." attributes:attributes]];
+    [self.refreshControl addTarget:self action:@selector(fetchFacts) forControlEvents:UIControlEventValueChanged];
 }
 
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
     [self configureUserInterface];
+    [self addRefreshControl];
+    [self fetchFacts];
 }
 
 - (void)configureUserInterface{
-    //prepare header
     UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 60)];
     headerView.backgroundColor = [UIColor blueColor];
     self.lblHeaderTitle = [[UILabel alloc] init];
@@ -50,7 +64,6 @@
     [headerView addConstraint:lblCenterY];
     headerView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.view addSubview:headerView];
-    //constrains for header
     NSLayoutConstraint *headerViewConstraintLeft = [NSLayoutConstraint constraintWithItem:headerView attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:headerView.superview attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0];
     NSLayoutConstraint *headerViewConstraintRight = [NSLayoutConstraint constraintWithItem:headerView attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:headerView.superview attribute:NSLayoutAttributeRight multiplier:1.0 constant:0];
     NSLayoutConstraint *headerViewConstraintTop = [NSLayoutConstraint constraintWithItem:headerView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:headerView.superview attribute:NSLayoutAttributeTop multiplier:1.0 constant:0];
@@ -59,18 +72,15 @@
     [headerView.superview addConstraint:headerViewConstraintLeft];
     [headerView.superview addConstraint:headerViewConstraintRight];
     [headerView.superview addConstraint:headerViewConstraintTop];
-    
-    //prepare table and populate
     CGRect tblFrame = self.view.frame;
     tblFrame.origin.y = headerView.bounds.size.height;
     tblFrame.size.height -= headerView.bounds.size.height;
     self.tblFacts = [[UITableView alloc] initWithFrame:tblFrame style:UITableViewStylePlain];
     self.tblFacts.dataSource = self;
     self.tblFacts.delegate = self;
+    [self.tblFacts setSeparatorStyle:UITableViewCellSeparatorStyleNone];
     [self.view addSubview:self.tblFacts];
     self.tblFacts.translatesAutoresizingMaskIntoConstraints = NO;
-    
-    //constraints for tblFacts
     NSLayoutConstraint *tblFactsConstraintLeft = [NSLayoutConstraint constraintWithItem:self.tblFacts attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.tblFacts.superview attribute:NSLayoutAttributeLeft multiplier:1.0 constant:0];
     NSLayoutConstraint *tblFactsConstraintRight = [NSLayoutConstraint constraintWithItem:self.tblFacts attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self.tblFacts.superview attribute:NSLayoutAttributeRight multiplier:1.0 constant:0];
     NSLayoutConstraint *tblFactsConstraintTop = [NSLayoutConstraint constraintWithItem:self.tblFacts attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:headerView attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0];
@@ -84,54 +94,45 @@
 - (void)fetchFacts{
     APIHandler *newAPIHandler = [[APIHandler alloc] init];
         [newAPIHandler executeRequest:requestFetchFacts withCallback:^(NSDictionary *response, NSError *error) {
-            NSLog(@"facts = %@",response);
             dispatch_async(dispatch_get_main_queue(), ^{
                 self.lblHeaderTitle.text = response[@"title"];
             });
+            [self.arrFacts removeAllObjects];
             NSArray *rawFacts = response[@"rows"];
             for (NSDictionary *rawFact in rawFacts){
                 Fact *fact = [[Fact alloc] initWithDictionary:rawFact];
                 [self.arrFacts addObject:fact];
             }
             [self.tblFacts reloadData];
-//            [self.tblFacts updateConstraints];
+            [self.refreshControl endRefreshing];
         }];
 }
 
-
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 #pragma mark tableview delegate methods
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
-    return 1;
-}
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return self.arrFacts.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    
     Fact *fact = self.arrFacts[indexPath.row];
     FactCell *cell;
     static NSString * cellId = @"";
     if (fact.imageHref == (NSString *)[NSNull null] || [fact.imageHref isEqualToString:@"null"] || fact.imageHref == nil){
-        cellId = @"factCellNew";
+        cellId = kFactCellIdWithoutImage;
         cell = (FactCell *)[tableView dequeueReusableCellWithIdentifier:cellId];
     }else{
-    cellId = @"factCell";
-    cell = (FactCell *)[tableView dequeueReusableCellWithIdentifier:cellId];
+        cellId = kFactCellIdWithImage;
+        cell = (FactCell *)[tableView dequeueReusableCellWithIdentifier:cellId];
     }
     if (cell == nil){
         cell = [[FactCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
     cell.tag = indexPath.row;
-    
     [cell configureCell:fact forIndexPath:indexPath];
     return cell;
 }
@@ -139,6 +140,4 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
         return UITableViewAutomaticDimension;
 }
-
-
 @end
