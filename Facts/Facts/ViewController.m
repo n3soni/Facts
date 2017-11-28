@@ -4,7 +4,7 @@
 //
 //  Created by LMS on 22/11/17.
 //  Copyright © 2017 Nitin. All rights reserved.
-//  
+//
 
 #import "ViewController.h"
 #import "Constants.h"
@@ -12,11 +12,15 @@
 #import "Fact.h"
 #import "FactCell.h"
 
+#define factImageHeight 200
+
 @interface ViewController () <UITableViewDelegate, UITableViewDataSource>
 @property (strong, nonatomic) UITableView *tblFacts;
 @property (strong, nonatomic) UILabel *lblHeaderTitle;
 @property (nonatomic, strong) NSMutableArray *arrFacts;
 @property (nonatomic, strong) UIRefreshControl *refreshControl;
+@property (nonatomic, strong) NSMutableDictionary *heightsInfoPortrait;
+@property (nonatomic, strong) NSMutableDictionary *heightsInfoLandscape;
 @end
 
 @implementation ViewController
@@ -24,6 +28,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.arrFacts = [NSMutableArray array];
+    self.heightsInfoPortrait = [NSMutableDictionary dictionary];
+    self.heightsInfoLandscape = [NSMutableDictionary dictionary];
 }
 
 - (void)addRefreshControl{
@@ -138,11 +144,55 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    NSNumber *height;
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if (UIDeviceOrientationIsPortrait(orientation)){
+    height = [self.heightsInfoPortrait objectForKey:indexPath];
+    }else{
+        height = [self.heightsInfoLandscape objectForKey:indexPath];
+    }
+    if(height) {
+        return height.floatValue;
+    } else {
         return UITableViewAutomaticDimension;
+    }
 }
 
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    return 300;
+    NSNumber *height;
+    UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+    if (UIDeviceOrientationIsPortrait(orientation)){
+        height = [self.heightsInfoPortrait objectForKey:indexPath];
+    }else{
+        height = [self.heightsInfoLandscape objectForKey:indexPath];
+    }
+    if(height) {
+        return height.floatValue;
+    } else {
+        Fact *fact = [self.arrFacts objectAtIndex:indexPath.row];
+        CGFloat titleHeight = [self heightOfLblWithText:fact.title Font:[UIFont boldSystemFontOfSize:18]];
+        CGFloat descHeight = [self heightOfLblWithText:fact.internalBaseClassDescription Font:[UIFont systemFontOfSize:12]];
+        CGFloat totalHeight = titleHeight + descHeight + 24;
+        if (fact.imageHref != (NSString *)[NSNull null] && ![fact.imageHref isEqualToString:@"null"] && fact.imageHref != nil){
+            totalHeight += factImageHeight;
+        }
+        NSNumber *height = @(totalHeight);
+        UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];
+        if (UIDeviceOrientationIsPortrait(orientation)){
+        [self.heightsInfoPortrait setObject:height forKey:indexPath];
+        }else{
+            [self.heightsInfoLandscape setObject:height forKey:indexPath];
+        }
+        return height.floatValue;
+    }
+}
+
+- (CGFloat)heightOfLblWithText: (NSString *)strText Font:(UIFont *)font{
+    NSDictionary *attributes = @{NSFontAttributeName: font};
+    CGRect rect = [strText boundingRectWithSize:CGSizeMake(self.view.bounds.size.width - 12, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin
+                                     attributes:attributes
+                                        context:nil];
+    return rect.size.height;
 }
 
 @end
