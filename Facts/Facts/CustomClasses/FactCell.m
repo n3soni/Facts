@@ -28,8 +28,8 @@ NSString *const kFactCellIdWithoutImage = @"factCellWithoutImage";
         [self.contentView addSubview:self.lblTitle];
         NSLayoutConstraint *lblTitleTop = [NSLayoutConstraint constraintWithItem:self.lblTitle attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.lblTitle.superview attribute:NSLayoutAttributeTop multiplier:1.0 constant:8];
         NSLayoutConstraint *lblTitleCenterX = [NSLayoutConstraint constraintWithItem:self.lblTitle attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.lblTitle.superview attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0];
-        NSLayoutConstraint *lblTitleLeft = [NSLayoutConstraint constraintWithItem:self.lblTitle attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationGreaterThanOrEqual toItem:self.lblTitle.superview attribute:NSLayoutAttributeLeft multiplier:1.0 constant:6];
-        NSLayoutConstraint *lblTitleRight = [NSLayoutConstraint constraintWithItem:self.lblTitle attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationGreaterThanOrEqual toItem:self.lblTitle.superview attribute:NSLayoutAttributeRight multiplier:1.0 constant:6];
+        NSLayoutConstraint *lblTitleLeft = [NSLayoutConstraint constraintWithItem:self.lblTitle attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.lblTitle.superview attribute:NSLayoutAttributeLeft multiplier:1.0 constant:6];
+        NSLayoutConstraint *lblTitleRight = [NSLayoutConstraint constraintWithItem:self.lblTitle attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self.lblTitle.superview attribute:NSLayoutAttributeRight multiplier:1.0 constant:6];
         [self.lblTitle.superview addConstraint:lblTitleTop];
         [self.lblTitle.superview addConstraint:lblTitleCenterX];
         [self.lblTitle.superview addConstraint:lblTitleLeft];
@@ -44,8 +44,8 @@ NSString *const kFactCellIdWithoutImage = @"factCellWithoutImage";
         [self.contentView addSubview:self.lblDescription];
         NSLayoutConstraint *lblDescriptionTop = [NSLayoutConstraint constraintWithItem:self.lblDescription attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.lblTitle attribute:NSLayoutAttributeBottom multiplier:1.0 constant:8];
         NSLayoutConstraint *lblDescriptionCenterX = [NSLayoutConstraint constraintWithItem:self.lblDescription attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.lblDescription.superview attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0];
-        NSLayoutConstraint *lblDescriptionLeft = [NSLayoutConstraint constraintWithItem:self.lblDescription attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationGreaterThanOrEqual toItem:self.lblDescription.superview attribute:NSLayoutAttributeLeft multiplier:1.0 constant:6];
-        NSLayoutConstraint *lblDescriptionRight = [NSLayoutConstraint constraintWithItem:self.lblDescription attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationGreaterThanOrEqual toItem:self.lblDescription.superview attribute:NSLayoutAttributeRight multiplier:1.0 constant:6];
+        NSLayoutConstraint *lblDescriptionLeft = [NSLayoutConstraint constraintWithItem:self.lblDescription attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:self.lblDescription.superview attribute:NSLayoutAttributeLeft multiplier:1.0 constant:6];
+        NSLayoutConstraint *lblDescriptionRight = [NSLayoutConstraint constraintWithItem:self.lblDescription attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:self.lblDescription.superview attribute:NSLayoutAttributeRight multiplier:1.0 constant:6];
         [self.lblDescription.superview addConstraint:lblDescriptionTop];
         [self.lblDescription.superview addConstraint:lblDescriptionCenterX];
         [self.lblDescription.superview addConstraint:lblDescriptionLeft];
@@ -125,24 +125,6 @@ NSString *const kFactCellIdWithoutImage = @"factCellWithoutImage";
     NSString *ddPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject;
     NSString *imgFolderPath = [ddPath stringByAppendingString:@"/img"];
     return [imgFolderPath stringByAppendingPathComponent:imageName];
-}
-
-- (void)layoutSubviews{
-    [super layoutSubviews];
-    for (UIView *subview in self.contentView.subviews){
-        if ([subview isKindOfClass:[UILabel class]]){
-            NSDictionary *attributes = @{NSFontAttributeName: ((UILabel *)subview).font};
-
-            CGRect rect = [((UILabel *)subview).text boundingRectWithSize:CGSizeMake(self.contentView.superview.bounds.size.width, CGFLOAT_MAX)
-                                                      options:NSStringDrawingUsesLineFragmentOrigin
-                                                   attributes:attributes
-                                                      context:nil];
-            CGRect newFrame = ((UILabel *)subview).frame;
-            newFrame.size.height = rect.size.height;
-            newFrame.origin.x = 6;
-            ((UILabel *)subview).frame = newFrame;
-        }
-    }
 }
 
 @end
