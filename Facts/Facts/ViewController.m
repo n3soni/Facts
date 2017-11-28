@@ -109,6 +109,10 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
 }
+//to resolve iPhone 5 UI issue
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation{
+    [self.tblFacts reloadData];
+}
 
 #pragma mark tableview delegate methods
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
