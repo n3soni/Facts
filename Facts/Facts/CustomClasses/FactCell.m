@@ -28,8 +28,12 @@ NSString *const kFactCellIdWithoutImage = @"factCellWithoutImage";
         [self.contentView addSubview:self.lblTitle];
         NSLayoutConstraint *lblTitleTop = [NSLayoutConstraint constraintWithItem:self.lblTitle attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self.lblTitle.superview attribute:NSLayoutAttributeTop multiplier:1.0 constant:8];
         NSLayoutConstraint *lblTitleCenterX = [NSLayoutConstraint constraintWithItem:self.lblTitle attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self.lblTitle.superview attribute:NSLayoutAttributeCenterX multiplier:1.0 constant:0];
+        NSLayoutConstraint *lblTitleLeft = [NSLayoutConstraint constraintWithItem:self.lblTitle attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationGreaterThanOrEqual toItem:self.lblTitle.superview attribute:NSLayoutAttributeLeft multiplier:1.0 constant:6];
+        NSLayoutConstraint *lblTitleRight = [NSLayoutConstraint constraintWithItem:self.lblTitle attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationGreaterThanOrEqual toItem:self.lblTitle.superview attribute:NSLayoutAttributeRight multiplier:1.0 constant:6];
         [self.lblTitle.superview addConstraint:lblTitleTop];
         [self.lblTitle.superview addConstraint:lblTitleCenterX];
+        [self.lblTitle.superview addConstraint:lblTitleLeft];
+        [self.lblTitle.superview addConstraint:lblTitleRight];
         
         self.lblDescription = [[UILabel alloc] initWithFrame:CGRectZero];
         self.lblDescription.numberOfLines = 0;
@@ -121,6 +125,24 @@ NSString *const kFactCellIdWithoutImage = @"factCellWithoutImage";
     NSString *ddPath = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject;
     NSString *imgFolderPath = [ddPath stringByAppendingString:@"/img"];
     return [imgFolderPath stringByAppendingPathComponent:imageName];
+}
+
+- (void)layoutSubviews{
+    [super layoutSubviews];
+    for (UIView *subview in self.contentView.subviews){
+        if ([subview isKindOfClass:[UILabel class]]){
+            NSDictionary *attributes = @{NSFontAttributeName: ((UILabel *)subview).font};
+
+            CGRect rect = [((UILabel *)subview).text boundingRectWithSize:CGSizeMake(self.contentView.superview.bounds.size.width, CGFLOAT_MAX)
+                                                      options:NSStringDrawingUsesLineFragmentOrigin
+                                                   attributes:attributes
+                                                      context:nil];
+            CGRect newFrame = ((UILabel *)subview).frame;
+            newFrame.size.height = rect.size.height;
+            newFrame.origin.x = 6;
+            ((UILabel *)subview).frame = newFrame;
+        }
+    }
 }
 
 @end
